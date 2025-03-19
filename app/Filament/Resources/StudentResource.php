@@ -29,10 +29,7 @@ class StudentResource extends Resource
 
     protected static ?string $navigationGroup = 'School Management';
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user() && (Auth::user()->hasRole(['admin']));
-    }    public static function form(Form $form): Form
+      public static function form(Form $form): Form
     {
         return $form
             ->schema([

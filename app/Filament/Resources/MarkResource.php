@@ -20,10 +20,7 @@ class MarkResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-collection';
     protected static ?string $navigationGroup = 'School Management';
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user() && (Auth::user()->hasRole(['admin', 'teacher']));
-    }
+   
 
     public static function form(Form $form): Form
     {

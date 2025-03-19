@@ -20,10 +20,7 @@ class SubjectResource extends Resource
 
     protected static ?string $navigationGroup = 'School Management';
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user() && (Auth::user()->hasRole(['admin']));
-    }    protected static ?string $navigationIcon = 'heroicon-o-collection';
+       protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     public static function form(Form $form): Form
     {
