@@ -79,5 +79,14 @@ class GradeResource extends Resource
             'create' => Pages\CreateGrade::route('/create'),
             'edit' => Pages\EditGrade::route('/{record}/edit'),
         ];
-    }    
+    }   
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin']));
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin']));
+    }   
 }

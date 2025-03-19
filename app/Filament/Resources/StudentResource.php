@@ -90,6 +90,14 @@ class StudentResource extends Resource
         ];
     }
 
-    
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin']));
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin']));
+    }  
 
 }

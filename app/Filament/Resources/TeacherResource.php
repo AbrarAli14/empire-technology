@@ -92,5 +92,14 @@ class TeacherResource extends Resource
             'dashboard' => Pages\TeacherDashboard::route('/dashboard'), // Add this line
 
         ];
-    }    
+    }   
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin']));
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin']));
+    }   
 }

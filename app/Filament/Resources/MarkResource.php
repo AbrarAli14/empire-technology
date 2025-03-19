@@ -69,5 +69,14 @@ class MarkResource extends Resource
             'add-mark' => Pages\AddMark::route('/add-mark/{studentId}')
 
         ];
+    }  
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin', 'teacher']));
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user() && (Auth::user()->hasRole(['admin', 'teacher']));
     }    
 }
