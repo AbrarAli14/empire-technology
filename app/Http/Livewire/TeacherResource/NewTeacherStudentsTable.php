@@ -15,7 +15,7 @@ class NewTeacherStudentsTable extends Component
 
     public function getTableQuery(): Builder
 {
-    $teacher = auth()->user();
+    $teacher = auth()->user()->teacher;
 
     return Student::query()
         ->whereHas('subjects', function (Builder $subjectQuery) use ($teacher) {
