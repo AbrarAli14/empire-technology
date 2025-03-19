@@ -43,6 +43,7 @@ public function addMark($studentId)
             $mark = $student->marks->first();
             $mark->attendance = !$mark->attendance;
             $mark->save();
+            
         } else {
             $teacher = auth()->user()->teacher;
             $subject = $student->subjects()->first(); 
