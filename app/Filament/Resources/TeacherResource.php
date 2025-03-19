@@ -4,9 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TeacherResource\Pages;
 use App\Filament\Resources\TeacherResource\RelationManagers;
-use App\Filament\Resources\TeacherResource\RelationManagers\SubjectsRelationManager;
+use App\Models\Subject;
 use App\Models\Teacher;
-use App\Models\User;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -17,7 +17,6 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class TeacherResource extends Resource
@@ -25,63 +24,54 @@ class TeacherResource extends Resource
     protected static ?string $model = Teacher::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
-   
-    protected static ?string $navigationGroup = 'School Management';
 
-      public static function form(Form $form): Form
+    public static function canViewAny(): bool
     {
-        return $form->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('email')
-                    ->email()
+        return Filament::auth()->user()->hasRole('admin') || Filament::auth()->user()->hasRole('teacher');
+    }
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                TextInput::make('name')->required(),
+                TextInput::make('email')->email()->required(),
+                TextInput::make('password')
+                    ->password()
                     ->required()
-                    ->unique(User::class, 'email'),
-            TextInput::make('password')
-                ->password()
-                ->required()
-                ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
-        ]);
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
+                Select::make('subjects')
+                    ->multiple()
+                    ->relationship('subjects', 'name')
+                    ->preload()
+                    ->required(),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                //
+      
+        ->columns([
+            
+            Tables\Columns\TextColumn::make('name'),
+            Tables\Columns\TextColumn::make('email'),
+            Tables\Columns\TextColumn::make('subjects.name')->label('Subjects'),
             ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function (Teacher $record) {
-                        $user = User::find($record->user_id);
-                        if ($user) {
-                            $user->delete();
-                        }
-                    }),            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
-    }
+        ->filters([
+        ])
+        ->actions([
+            Tables\Actions\EditAction::make(),
+            Tables\Actions\DeleteAction::make(),
+        ]);
+}
+    
     
     public static function getRelations(): array
     {
         return [
-            RelationManagers\SubjectsRelationManager::class,
-
+            //
         ];
     }
-    
-   
-    
-   
     
     public static function getPages(): array
     {
@@ -89,8 +79,6 @@ class TeacherResource extends Resource
             'index' => Pages\ListTeachers::route('/'),
             'create' => Pages\CreateTeacher::route('/create'),
             'edit' => Pages\EditTeacher::route('/{record}/edit'),
-            'dashboard' => Pages\TeacherDashboard::route('/dashboard'), // Add this line
-
         ];
     }    
 }

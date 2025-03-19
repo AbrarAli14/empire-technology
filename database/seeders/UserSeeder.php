@@ -11,27 +11,28 @@ class UserSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run()
-{
-    $admin = User::create([
-        'name' => 'Admin User',
-        'email' => 'admin@example.com',
-        'password' => bcrypt('password'),
-    ]);
-    $admin->assignRole('admin');
-
-    $teacher = User::create([
-        'name' => 'Teacher User',
-        'email' => 'teacher@example.com',
-        'password' => bcrypt('password'),
-    ]);
-    $teacher->assignRole('teacher');
-
-    $student = User::create([
-        'name' => 'Student User',
-        'email' => 'student@example.com',
-        'password' => bcrypt('password'),
-    ]);
-    $student->assignRole('student');
-}
+    public function run(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $admin->assignRole('admin');
+    
+        $teacher = User::create([
+            'name' => 'Teacher User',
+            'email' => 'teacher@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $teacher->assignRole('teacher');
+    
+        $student = User::create([
+            'name' => 'Student User',
+            'email' => 'student@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $student->assignRole('student');
+        //
+    }
 }

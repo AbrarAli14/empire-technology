@@ -3,66 +3,52 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AttendanceResource\Pages;
+use App\Filament\Resources\AttendanceResource\RelationManagers;
 use App\Models\Attendance;
+use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AttendanceResource extends Resource
 {
-
     protected static ?string $model = Attendance::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
-
-    protected static ?string $navigationGroup = 'School Management';
-
+    public static function canViewAny(): bool
+    {
+        return Filament::auth()->user()->hasRole('admin') || Filament::auth()->user()->hasRole('teacher');
+    }
     public static function form(Form $form): Form
     {
         return $form
         ->schema([
+            Select::make('teacher_id')
+                ->relationship('teacher', 'name')
+                ->preload()
+                ->required(),
             Select::make('student_id')
-                ->label('Student')
-                ->options(function () {
-                    if (!Auth::user()->teacher) {
-                        return \App\Models\Student::pluck('name', 'id'); 
-                    }
-
-                    return \App\Models\Student::whereHas('subjects', function ($query) {
-                        $query->whereHas('teachers', function ($teacherQuery) {
-                            $teacherQuery->where('teachers.id', Auth::user()->teacher->id);
-                        });
-                    })->pluck('name', 'id');
-                })
+                ->relationship('student', 'name')
+                ->preload()
                 ->required(),
             Select::make('subject_id')
-                ->label('Subject')
-                ->options(function () {
-                    if (!Auth::user()->teacher) {
-                        return \App\Models\Subject::pluck('name', 'id');
-                    }
-
-                    return \App\Models\Subject::whereHas('teachers', function ($query) {
-                        $query->where('teachers.id', Auth::user()->teacher->id);
-                    })->pluck('name', 'id');
-                })
+                ->relationship('subject', 'name')
+                ->preload()
                 ->required(),
-            TextInput::make('attendance_date')
-                ->type('date')
-                ->default(now()->format('Y-m-d'))
-                ->label('Attendance Date')
-                ->required(),
-            Select::make('is_present')
+            DatePicker::make('date')->required(),
+            Radio::make('status')
                 ->options([
-                    1 => 'Present',
-                    0 => 'Absent',
+                    'present' => 'Present',
+                    'absent' => 'Absent',
                 ])
-                ->default(1)
-                ->label('Attendance Status'),
+                ->required(),
         ]);
     }
 
@@ -70,16 +56,7 @@ class AttendanceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('student.name')
-                ->sortable(),
-            Tables\Columns\TextColumn::make('subject.name')
-                ->sortable(),
-            Tables\Columns\TextColumn::make('attendance_date')
-                ->date()
-                ->sortable(),
-            Tables\Columns\IconColumn::make('is_present')
-                ->boolean()
-                ->label('Present'),
+                //
             ])
             ->filters([
                 //
@@ -106,14 +83,5 @@ class AttendanceResource extends Resource
             'create' => Pages\CreateAttendance::route('/create'),
             'edit' => Pages\EditAttendance::route('/{record}/edit'),
         ];
-    } 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return Auth::user() && (Auth::user()->hasRole(['admin', 'teacher']));
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Auth::user() && (Auth::user()->hasRole(['admin', 'teacher']));
-    }   
+    }    
 }

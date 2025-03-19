@@ -3,18 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Student;
-use App\Models\Teacher;
+use App\Models\Grade;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+
 class User extends Authenticatable
 {
-    use HasApiTokens,HasRoles, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable,HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -26,7 +27,15 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    public function grades(): HasMany
+    {
+        return $this->hasMany(Grade::class, 'student_id');
+    }
 
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Subject::class, 'teacher_student', 'teacher_id', 'student_id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -36,15 +45,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-    public function teacher(): HasOne
-    {
-        return $this->hasOne(Teacher::class);
-    }
 
-    public function student(): HasOne
-    {
-        return $this->hasOne(Student::class);
-    }
     /**
      * The attributes that should be cast.
      *
@@ -54,4 +55,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    
 }
