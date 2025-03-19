@@ -12,16 +12,13 @@ class RoleSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run()
-{
-    // Roles
-    $admin = Role::create(['name' => 'admin']);
-    $teacher = Role::create(['name' => 'teacher']);
-    $student = Role::create(['name' => 'student']);
 
-    // Permissions
+public function run()
+{
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
     $permissions = [
-        'manage-teachers',
+    'manage-teachers',
         'manage-students',
         'manage-subjects',
         'assign-grades',
@@ -29,12 +26,23 @@ class RoleSeeder extends Seeder
     ];
 
     foreach ($permissions as $permission) {
-        Permission::create(['name' => $permission]);
+        Permission::firstOrCreate(['name' => $permission]);
     }
 
-    // Assign permissions
-    $admin->givePermissionTo(Permission::all());
-    $teacher->givePermissionTo(['assign-grades', 'view-grades']);
-    $student->givePermissionTo(['view-grades']);
-}
-}
+    $admin = Role::firstOrCreate(['name' => 'admin'], ['guard_name' => 'web']);
+    $teacher = Role::updateOrCreate(['name' => 'teacher'], ['guard_name' => 'web']);
+    $student = Role::updateOrCreate(['name' => 'student'], ['guard_name' => 'web']);
+    
+    
+    $admin->syncPermissions(Permission::all());
+
+    $teacher->syncPermissions([
+        'assign-grades', 
+        'view-grades'
+       
+    ]);$student->syncPermissions([
+        'view-grades',
+       
+    ]);
+
+}}
