@@ -10,10 +10,5 @@ class ListMarks extends ListRecords
 {
     protected static string $resource = MarkResource::class;
 
-    protected function getActions(): array
-    {
-        return [
-            Actions\CreateAction::make(),
-        ];
-    }
+    
 }

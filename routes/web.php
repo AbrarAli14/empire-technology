@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StudentDashboardController;
-
+use App\Filament\Resources\TeacherResource\Pages\TeacherDashboard;
+use Filament\Shield\Middleware\RoleMiddleware;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,8 +13,8 @@ use App\Http\Controllers\StudentDashboardController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::middleware('auth')->get('/student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
+Route::middleware(['auth', 'role:teacher'])->get('/teacher/dashboard', \App\Filament\Resources\TeacherResource\Pages\TeacherDashboard::class)
+     ->name('filament.resources.teacher-resource.pages.teacher-dashboard');
 
 Route::get('/', function () {
     return view('welcome');
