@@ -961,9 +961,12 @@
                 "php": "^8.0",
                 "spatie/laravel-package-tools": "^1.9"
             },
+            "type": "library",
             "extra": {
                 "laravel": {
-                    "dont-discover": []
+                    "providers": [
+                        "Filament\\FilamentServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -9353,12 +9356,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
